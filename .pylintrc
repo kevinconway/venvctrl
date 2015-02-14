@@ -48,7 +48,8 @@ confidence=
 
 # Disable F0401 to hide issues with Pylint importing modules.
 # Disable R0901 to hide warnings caused by use of mixins.
-disable=F0401,R0901
+# Disable W0201 to hide warnings caused by use of mixins.
+disable=F0401,R0901,W0201
 
 
 [MISCELLANEOUS]
@@ -125,7 +126,7 @@ generated-members=
 spelling-dict=en_US
 
 # List of comma separated words that should not be checked.
-spelling-ignore-words=config,namespace,iterable,json,ini,regex,namespaces,str,JSON,INI,init,behaviour,setattr,getattr,classmethod,instancemethod,dict,bool,metadata,iteritems,args,kwargs,cls,iter,subclass,subclasses,api,API,unicode,_namespaces,NAMESPACES,_NAMESPACES,proxied,hasattr,prepend,prepended,os,env,cli,CLI,arg,args,argv,url,URL,uninstall,mixin,Mixin,pip,subshell,csh,sh,symlink,symlinked,symlinking,pypi,cmd
+spelling-ignore-words=config,namespace,iterable,json,ini,regex,namespaces,str,JSON,INI,init,behaviour,setattr,getattr,classmethod,instancemethod,dict,bool,metadata,iteritems,args,kwargs,cls,iter,subclass,subclasses,api,API,unicode,_namespaces,NAMESPACES,_NAMESPACES,proxied,hasattr,prepend,prepended,os,env,cli,CLI,arg,args,argv,url,URL,uninstall,mixin,Mixin,pip,subshell,csh,sh,symlink,symlinked,symlinking,pypi,cmd,txt
 
 # A path to a file that contains private dictionary; one word per line.
 spelling-private-dict-file=
