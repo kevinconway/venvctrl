@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import collections
 import shlex
 import subprocess
+import sys
 
 
 CommandResult = collections.namedtuple('CommandResult', ('code', 'out', 'err'))
@@ -20,9 +21,13 @@ class CommandMixin(object):
     @staticmethod
     def _execute(cmd):
         """Run a command in a subshell."""
-        cmd = shlex.split(cmd)
+        cmd_parts = shlex.split(cmd)
+        if sys.version_info[0] < 3:
+
+            cmd_parts = shlex.split(cmd.encode('ascii'))
+
         proc = subprocess.Popen(
-            cmd,
+            cmd_parts,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -37,8 +42,8 @@ class CommandMixin(object):
 
         return CommandResult(
             code=proc.returncode,
-            out=out.decode(),
-            err=err.decode(),
+            out=out.decode('utf8'),
+            err=err.decode('utf8'),
         )
 
     def cmd_path(self, cmd):
