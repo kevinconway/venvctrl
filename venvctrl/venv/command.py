@@ -21,14 +21,12 @@ class CommandMixin(object):
     def _execute(cmd):
         """Run a command in a subshell."""
         cmd = shlex.split(cmd)
-        print(cmd)
         proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
         out, err = proc.communicate()
-        print(out, err)
         if proc.returncode != 0:
 
             raise subprocess.CalledProcessError(
