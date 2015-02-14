@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 
 import argparse
 
-from ..venv import api
+from .. import api
 
 
 def relocate(source, destination, move=False):

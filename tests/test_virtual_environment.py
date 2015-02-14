@@ -41,6 +41,13 @@ def test_pip(venv):
     assert venv.has_package('confpy')
     venv.uninstall_package('confpy')
     assert not venv.has_package('confpy')
+    path = os.path.join(venv.path, '..', 'requirements.txt')
+    with open(path, 'w') as req_file:
+
+        req_file.write('confpy{0}'.format(os.linesep))
+
+    venv.install_requirements(path)
+    assert venv.has_package('confpy')
 
 
 def test_relocate(venv):

@@ -155,7 +155,7 @@ class BinFile(VenvFile):
             if hashtag == b'#!':
 
                 file_handle.seek(0)
-                return file_handle.readline().decode()
+                return file_handle.readline().decode('utf8')
 
         return None
 

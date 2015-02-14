@@ -49,6 +49,20 @@ class PipMixin(object):
 
         self.pip('{0} {1}'.format(cmd, name))
 
+    def install_requirements(self, path, index=None):
+        """Install packages from a requirements.txt file.
+
+        Args:
+            path (str): The path to the requirements file.
+            index (str): The URL for a pypi index to use.
+        """
+        cmd = 'install -r {0}'.format(path)
+        if index:
+
+            cmd = 'install --index-url {0} -r {1}'.format(index, path)
+
+        self.pip(cmd)
+
     def uninstall_package(self, name):
         """Uninstall a given package.
 
