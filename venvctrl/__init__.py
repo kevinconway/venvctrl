@@ -1,4 +1,4 @@
-"""RPM helper for packaging virtual environments."""
+"""Python API for managing virtualenv."""
 
 from __future__ import division
 from __future__ import absolute_import
