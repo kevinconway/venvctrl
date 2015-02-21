@@ -1,4 +1,4 @@
 include README.rst
 include requirements.txt
 include LICENSE
-recursive-include rpmvenv *
+recursive-include venvctrl *
