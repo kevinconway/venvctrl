@@ -1,5 +1,5 @@
 pep8
-pyflakes
+pyflakes>=1.0,<2.0
 pylint
 pytest
 pyenchant
