@@ -29,7 +29,9 @@ class RelocateMixin(object):
 
         for binfile in self.bin.files:
 
-            if binfile.shebang and ('python' in binfile.shebang or 'pypy' in binfile.shebang):
+            if binfile.shebang and (
+                    'python' in binfile.shebang or 'pypy' in binfile.shebang
+            ):
 
                 binfile.shebang = '#!{0}'.format(
                     os.path.join(destination, 'bin', 'python')
