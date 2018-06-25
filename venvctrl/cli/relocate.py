@@ -25,6 +25,7 @@ def relocate(source, destination, move=False):
         return None
 
     venv.move(destination)
+    return None
 
 
 def main():
