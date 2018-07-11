@@ -54,7 +54,7 @@ def test_relocate(venv):
     """Test the ability to relocate a venv."""
     path = '/testpath'
     pypy_shebang = "#!/usr/bin/env pypy"
-    f = open(venv.abspath + "/pypy_shebang.py", "w")
+    f = open(venv.bin.abspath + "/pypy_shebang.py", "w")
     f.write(pypy_shebang)
     f.close()
     venv.relocate(path)
