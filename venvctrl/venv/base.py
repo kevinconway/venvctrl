@@ -81,7 +81,7 @@ class VenvFile(VenvPath):
             line += os.linesep
         try:
 
-            with open(self.path, 'r') as file_handle:
+            with open(self.path, 'r', encoding="ascii", errors="surrogateescape") as file_handle:
 
                 for count, new_line in enumerate(file_handle):
 
@@ -92,7 +92,7 @@ class VenvFile(VenvPath):
                     tmp_file.write(new_line)
 
             tmp_file.seek(0)
-            with open(self.path, 'w') as file_handle:
+            with open(self.path, 'w', encoding="ascii", errors="surrogateescape") as file_handle:
 
                 for new_line in tmp_file:
 
