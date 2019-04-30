@@ -29,13 +29,20 @@ class RelocateMixin(object):
 
         for binfile in self.bin.files:
 
-            if binfile.shebang and (
-                    'python' in binfile.shebang or 'pypy' in binfile.shebang
+            shebang = binfile.shebang
+            if shebang and len(shebang) == 1 and (
+                    'python' in shebang[0] or 'pypy' in shebang[0]
             ):
-
-                binfile.shebang = '#!{0}'.format(
+                binfile.shebang = ['#!{0}'.format(
+                    os.path.join(destination, 'bin', 'python')
+                )]
+            elif shebang and len(shebang) == 3 and (
+                    'python' in shebang[1] or 'pypy' in shebang[1]
+            ):
+                shebang[1] = '\'\'\'exec\' {0} "$0" "$@"'.format(
                     os.path.join(destination, 'bin', 'python')
                 )
+                binfile.shebang = shebang
 
     def move(self, destination):
         """Reconfigure and move the virtual environment to another path.

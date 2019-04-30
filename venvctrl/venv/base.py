@@ -153,9 +153,14 @@ class BinFile(VenvFile):
         with open(self.path, 'rb') as file_handle:
             hashtag = file_handle.read(2)
             if hashtag == b'#!':
+                # Check if we're using the new style shebang
+                new_style_shebang = \
+                    file_handle.readline() == b'/bin/sh\n' and \
+                    file_handle.read(8) == b"'''exec'"
 
                 file_handle.seek(0)
-                return file_handle.readline().decode('utf8')
+                return [next(file_handle).decode('utf8') for _
+                        in range(3 if new_style_shebang else 1)]
 
         return None
 
@@ -171,11 +176,17 @@ class BinFile(VenvFile):
 
             raise ValueError('Cannot modify a shebang if it does not exist.')
 
-        if not new_shebang.startswith('#!'):
+        if len(self.shebang) != len(new_shebang):
+
+            raise ValueError('Old and new shebangs must '
+                             'be same number of lines')
+
+        if not new_shebang[0].startswith('#!'):
 
             raise ValueError('Invalid shebang.')
 
-        self.writeline(new_shebang, 0)
+        for line_num, line in enumerate(new_shebang):
+            self.writeline(line, line_num)
 
 
 class ActivateFile(BinFile):
