@@ -66,10 +66,9 @@ def test_relocate(venv):
 
         if script.shebang:
 
-            assert script.shebang == ['#!{0}/bin/python{1}'.format(
+            assert script.shebang == '#!{0}/bin/python'.format(
                 path,
-                os.linesep,
-            )]
+            )
 
 
 def test_relocate_long_shebang(venv):
@@ -87,16 +86,20 @@ def test_relocate_long_shebang(venv):
 
     for script in venv.bin.files:
         shebang = script.shebang
-        if shebang and len(shebang) == 1:
-            assert shebang == ['#!{0}/bin/python{1}'.format(
-                path,
-                os.linesep,
-            )]
+        if shebang:
+            shebang = shebang.split(os.linesep)
+            if len(shebang) == 1:
+                assert shebang == ['#!{0}/bin/python'.format(
+                    path
+                )]
 
-        elif shebang and len(shebang) == 3:
-            assert shebang == \
-                   ['#!/bin/sh{0}'.format(os.linesep),
-                    '\'\'\'exec\' {0}/bin/python "$0" "$@"{1}'.format(
-                        path,
-                        os.linesep),
-                    "' '''{0}".format(os.linesep)]
+            elif len(shebang) == 3:
+                assert shebang == \
+                       ['#!/bin/sh',
+                        '\'\'\'exec\' {0}/bin/python "$0" "$@"'.format(
+                            path),
+                        "' '''"]
+
+            else:
+                assert False, "Invalid shebang length: {0}, {1}".format(
+                    len(shebang), script.shebang)

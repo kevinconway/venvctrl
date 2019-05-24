@@ -159,8 +159,9 @@ class BinFile(VenvFile):
                     file_handle.read(8) == b"'''exec'"
 
                 file_handle.seek(0)
-                return [next(file_handle).decode('utf8') for _
-                        in range(3 if new_style_shebang else 1)]
+                return os.linesep.join(
+                    [next(file_handle).decode('utf8').strip() for _
+                     in range(3 if new_style_shebang else 1)])
 
         return None
 
@@ -172,11 +173,19 @@ class BinFile(VenvFile):
             ValueError: If the file has no shebang to modify.
             ValueError: If the new shebang is invalid.
         """
+
         if not self.shebang:
 
             raise ValueError('Cannot modify a shebang if it does not exist.')
 
-        if len(self.shebang) != len(new_shebang):
+        if new_shebang is None:
+
+            raise ValueError('New shebang cannot be None.')
+
+        old_shebang = self.shebang.strip().split(os.linesep)
+        new_shebang = new_shebang.strip().split(os.linesep)
+
+        if len(old_shebang) != len(new_shebang):
 
             raise ValueError('Old and new shebangs must '
                              'be same number of lines')
