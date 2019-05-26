@@ -49,7 +49,8 @@ confidence=
 # Disable F0401 to hide issues with Pylint importing modules.
 # Disable R0901 to hide warnings caused by use of mixins.
 # Disable W0201 to hide warnings caused by use of mixins.
-disable=F0401,R0901,W0201
+# Disable R0205 to hide Python3.X warnings of inheriting from object.
+disable=F0401,R0901,W0201,R0205
 
 
 [MISCELLANEOUS]
