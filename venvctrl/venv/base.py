@@ -275,7 +275,7 @@ class BinDir(VenvDir):
                 self.activate_fish,
                 self.activate_xsh,
             )
-            if activation.exists()
+            if activation.exists
         )
 
     @property
