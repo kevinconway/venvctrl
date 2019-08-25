@@ -268,10 +268,14 @@ class BinDir(VenvDir):
     def activates(self):
         """Get an iter of activate files in the virtual environment."""
         return (
-            self.activate_sh,
-            self.activate_csh,
-            self.activate_fish,
-            self.activate_xsh,
+            activation
+            for activation in (
+                self.activate_sh,
+                self.activate_csh,
+                self.activate_fish,
+                self.activate_xsh,
+            )
+            if activation.exists()
         )
 
     @property
