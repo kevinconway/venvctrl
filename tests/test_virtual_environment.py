@@ -102,3 +102,28 @@ def test_relocate_long_shebang(venv):
                 assert False, "Invalid shebang length: {0}, {1}".format(
                     len(shebang), script.shebang
                 )
+
+
+def test_relocate_no_original_path(venv):
+    """Test that the original path is not found in files."""
+    path = "/testpath"
+    original_path = venv.abspath
+    f = open(venv.bin.abspath + "/something.pth", "w")
+    f.write(original_path)
+    f.close()
+    venv.relocate(path)
+    dirs = list(venv.dirs)
+    files = list(venv.files)
+    while len(dirs) > 0 or len(files) > 0:
+        for file_ in files:
+            with open(file_.abspath, "r") as source:
+                try:
+                    lines = source.readlines()
+                except UnicodeDecodeError:
+                    # Skip any non-text files. Binary files are out of
+                    # scope for this test.
+                    continue
+                for line in lines:
+                    assert original_path not in line, file_.abspath
+        next_dir = dirs.pop()
+        files = list(next_dir.files)
