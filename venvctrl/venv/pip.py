@@ -22,7 +22,7 @@ class PipMixin(object):
         Returns:
             bool: True if installed else false.
         """
-        return name in self.pip('list').out
+        return name in self.pip("list").out
 
     def install_package(self, name, index=None, force=False, update=False):
         """Install a given package.
@@ -34,20 +34,20 @@ class PipMixin(object):
             force (bool): For the reinstall of packages during updates.
             update (bool): Update the package if it is out of date.
         """
-        cmd = 'install'
+        cmd = "install"
         if force:
 
-            cmd = '{0} {1}'.format(cmd, '--force-reinstall')
+            cmd = "{0} {1}".format(cmd, "--force-reinstall")
 
         if update:
 
-            cmd = '{0} {1}'.format(cmd, '--update')
+            cmd = "{0} {1}".format(cmd, "--update")
 
         if index:
 
-            cmd = '{0} {1}'.format(cmd, '--index-url {0}'.format(index))
+            cmd = "{0} {1}".format(cmd, "--index-url {0}".format(index))
 
-        self.pip('{0} {1}'.format(cmd, name))
+        self.pip("{0} {1}".format(cmd, name))
 
     def install_requirements(self, path, index=None):
         """Install packages from a requirements.txt file.
@@ -56,10 +56,10 @@ class PipMixin(object):
             path (str): The path to the requirements file.
             index (str): The URL for a pypi index to use.
         """
-        cmd = 'install -r {0}'.format(path)
+        cmd = "install -r {0}".format(path)
         if index:
 
-            cmd = 'install --index-url {0} -r {1}'.format(index, path)
+            cmd = "install --index-url {0} -r {1}".format(index, path)
 
         self.pip(cmd)
 
@@ -69,4 +69,4 @@ class PipMixin(object):
         Args:
             name (str): The name of the package to uninstall.
         """
-        self.pip('{0} --yes {1}'.format('uninstall', name))
+        self.pip("{0} --yes {1}".format("uninstall", name))
