@@ -75,13 +75,13 @@ class VenvFile(VenvPath):
             line_number (int): The line of the file to rewrite. Numbering
                 starts at 0.
         """
-        tmp_file = tempfile.TemporaryFile('w+')
+        tmp_file = tempfile.TemporaryFile("w+")
         if not line.endswith(os.linesep):
 
             line += os.linesep
         try:
 
-            with open(self.path, 'r') as file_handle:
+            with open(self.path, "r") as file_handle:
 
                 for count, new_line in enumerate(file_handle):
 
@@ -92,7 +92,7 @@ class VenvFile(VenvPath):
                     tmp_file.write(new_line)
 
             tmp_file.seek(0)
-            with open(self.path, 'w') as file_handle:
+            with open(self.path, "w") as file_handle:
 
                 for new_line in tmp_file:
 
@@ -150,18 +150,22 @@ class BinFile(VenvFile):
     @property
     def shebang(self):
         """Get the file shebang if is has one."""
-        with open(self.path, 'rb') as file_handle:
+        with open(self.path, "rb") as file_handle:
             hashtag = file_handle.read(2)
-            if hashtag == b'#!':
+            if hashtag == b"#!":
                 # Check if we're using the new style shebang
-                new_style_shebang = \
-                    file_handle.readline() == b'/bin/sh\n' and \
-                    file_handle.read(8) == b"'''exec'"
+                new_style_shebang = (
+                    file_handle.readline() == b"/bin/sh\n"
+                    and file_handle.read(8) == b"'''exec'"
+                )
 
                 file_handle.seek(0)
                 return os.linesep.join(
-                    [next(file_handle).decode('utf8').strip() for _
-                     in range(3 if new_style_shebang else 1)])
+                    [
+                        next(file_handle).decode("utf8").strip()
+                        for _ in range(3 if new_style_shebang else 1)
+                    ]
+                )
 
         return None
 
@@ -176,23 +180,24 @@ class BinFile(VenvFile):
 
         if not self.shebang:
 
-            raise ValueError('Cannot modify a shebang if it does not exist.')
+            raise ValueError("Cannot modify a shebang if it does not exist.")
 
         if new_shebang is None:
 
-            raise ValueError('New shebang cannot be None.')
+            raise ValueError("New shebang cannot be None.")
 
         old_shebang = self.shebang.strip().split(os.linesep)
         new_shebang = new_shebang.strip().split(os.linesep)
 
         if len(old_shebang) != len(new_shebang):
 
-            raise ValueError('Old and new shebangs must '
-                             'be same number of lines')
+            raise ValueError(
+                "Old and new shebangs must " "be same number of lines"
+            )
 
-        if not new_shebang[0].startswith('#!'):
+        if not new_shebang[0].startswith("#!"):
 
-            raise ValueError('Invalid shebang.')
+            raise ValueError("Invalid shebang.")
 
         for line_num, line in enumerate(new_shebang):
             self.writeline(line, line_num)
@@ -207,7 +212,7 @@ class ActivateFile(BinFile):
 
     def _find_vpath(self):
         """Find the VIRTUAL_ENV path entry."""
-        with open(self.path, 'r') as file_handle:
+        with open(self.path, "r") as file_handle:
 
             for count, line in enumerate(file_handle):
 
@@ -259,17 +264,17 @@ class BinDir(VenvDir):
     @property
     def activate_sh(self):
         """Get the /bin/activate script."""
-        return ActivateFile(os.path.join(self.path, 'activate'))
+        return ActivateFile(os.path.join(self.path, "activate"))
 
     @property
     def activate_csh(self):
         """Get the /bin/activate.csh script."""
-        return ActivateCshFile(os.path.join(self.path, 'activate.csh'))
+        return ActivateCshFile(os.path.join(self.path, "activate.csh"))
 
     @property
     def activate_fish(self):
         """Get the /bin/activate.fish script."""
-        return ActivateFishFile(os.path.join(self.path, 'activate.fish'))
+        return ActivateFishFile(os.path.join(self.path, "activate.fish"))
 
     @property
     def files(self):
@@ -303,19 +308,19 @@ class VirtualEnvironment(VenvDir):
     @property
     def bin(self):
         """Get the /bin directory."""
-        return BinDir(os.path.join(self.path, 'bin'))
+        return BinDir(os.path.join(self.path, "bin"))
 
     @property
     def include(self):
         """Get the /include directory."""
-        return VenvDir(os.path.join(self.path, 'include'))
+        return VenvDir(os.path.join(self.path, "include"))
 
     @property
     def lib(self):
         """Get the /lib directory."""
-        return VenvDir(os.path.join(self.path, 'lib'))
+        return VenvDir(os.path.join(self.path, "lib"))
 
     @property
     def local(self):
         """Get the /local directory."""
-        return VenvDir(os.path.join(self.path, 'local'))
+        return VenvDir(os.path.join(self.path, "local"))

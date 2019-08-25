@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 
-CommandResult = collections.namedtuple('CommandResult', ('code', 'out', 'err'))
+CommandResult = collections.namedtuple("CommandResult", ("code", "out", "err"))
 
 
 class CommandMixin(object):
@@ -24,26 +24,22 @@ class CommandMixin(object):
         cmd_parts = shlex.split(cmd)
         if sys.version_info[0] < 3:
 
-            cmd_parts = shlex.split(cmd.encode('ascii'))
+            cmd_parts = shlex.split(cmd.encode("ascii"))
 
         proc = subprocess.Popen(
-            cmd_parts,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            cmd_parts, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         out, err = proc.communicate()
         if proc.returncode != 0:
 
             raise subprocess.CalledProcessError(
-                returncode=proc.returncode,
-                cmd=cmd,
-                output=err,
+                returncode=proc.returncode, cmd=cmd, output=err
             )
 
         return CommandResult(
             code=proc.returncode,
-            out=out.decode('utf8'),
-            err=err.decode('utf8'),
+            out=out.decode("utf8"),
+            err=err.decode("utf8"),
         )
 
     def cmd_path(self, cmd):
@@ -60,11 +56,11 @@ class CommandMixin(object):
         """
         for binscript in self.bin.files:
 
-            if binscript.path.endswith('/{0}'.format(cmd)):
+            if binscript.path.endswith("/{0}".format(cmd)):
 
                 return binscript.path
 
-        raise ValueError('The command {0} was not found.'.format(cmd))
+        raise ValueError("The command {0} was not found.".format(cmd))
 
     def run(self, cmd):
         """Execute a script from the virtual environment /bin directory."""
@@ -72,12 +68,12 @@ class CommandMixin(object):
 
     def python(self, cmd):
         """Execute a python script using the virtual environment python."""
-        python_bin = self.cmd_path('python')
-        cmd = '{0} {1}'.format(python_bin, cmd)
+        python_bin = self.cmd_path("python")
+        cmd = "{0} {1}".format(python_bin, cmd)
         return self._execute(cmd)
 
     def pip(self, cmd):
         """Execute some pip function using the virtual environment pip."""
-        pip_bin = self.cmd_path('pip')
-        cmd = '{0} {1}'.format(pip_bin, cmd)
+        pip_bin = self.cmd_path("pip")
+        cmd = "{0} {1}".format(pip_bin, cmd)
         return self._execute(cmd)

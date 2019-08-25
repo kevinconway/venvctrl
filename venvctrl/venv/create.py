@@ -24,18 +24,18 @@ class CreateMixin(object):
             always_copy (bool): Whether or not to force copying instead of
                 symlinking in the virtual environment. Default is False.
         """
-        command = 'virtualenv'
+        command = "virtualenv"
         if python:
 
-            command = '{0} --python={1}'.format(command, python)
+            command = "{0} --python={1}".format(command, python)
 
         if system_site:
 
-            command = '{0} --system-site-packages'.format(command)
+            command = "{0} --system-site-packages".format(command)
 
         if always_copy:
 
-            command = '{0} --always-copy'.format(command)
+            command = "{0} --always-copy".format(command)
 
-        command = '{0} {1}'.format(command, self.path)
+        command = "{0} {1}".format(command, self.path)
         self._execute(command)

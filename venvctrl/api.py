@@ -13,11 +13,11 @@ from .venv import relocate
 
 
 class VirtualEnvironment(
-        base.VirtualEnvironment,
-        command.CommandMixin,
-        create.CreateMixin,
-        pip.PipMixin,
-        relocate.RelocateMixin,
+    base.VirtualEnvironment,
+    command.CommandMixin,
+    create.CreateMixin,
+    pip.PipMixin,
+    relocate.RelocateMixin,
 ):
 
     """Virtual environment management class."""

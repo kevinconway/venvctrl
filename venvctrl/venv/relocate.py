@@ -34,16 +34,16 @@ class RelocateMixin(object):
                 shebang = shebang.strip().split(os.linesep)
 
                 if len(shebang) == 1 and (
-                        'python' in shebang[0] or 'pypy' in shebang[0]
+                    "python" in shebang[0] or "pypy" in shebang[0]
                 ):
-                    binfile.shebang = '#!{0}'.format(
-                        os.path.join(destination, 'bin', 'python')
+                    binfile.shebang = "#!{0}".format(
+                        os.path.join(destination, "bin", "python")
                     )
                 elif len(shebang) == 3 and (
-                        'python' in shebang[1] or 'pypy' in shebang[1]
+                    "python" in shebang[1] or "pypy" in shebang[1]
                 ):
-                    shebang[1] = '\'\'\'exec\' {0} "$0" "$@"'.format(
-                        os.path.join(destination, 'bin', 'python')
+                    shebang[1] = "'''exec' {0} \"$0\" \"$@\"".format(
+                        os.path.join(destination, "bin", "python")
                     )
                     binfile.shebang = os.linesep.join(shebang)
 

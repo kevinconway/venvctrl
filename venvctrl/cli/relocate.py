@@ -31,29 +31,27 @@ def relocate(source, destination, move=False):
 def main():
     """Relocate a virtual environment."""
     parser = argparse.ArgumentParser(
-        description='Relocate a virtual environment.'
+        description="Relocate a virtual environment."
     )
     parser.add_argument(
-        '--source',
-        help='The existing virtual environment.',
+        "--source", help="The existing virtual environment.", required=True
+    )
+    parser.add_argument(
+        "--destination",
+        help="The location for which to configure the virtual environment.",
         required=True,
     )
     parser.add_argument(
-        '--destination',
-        help='The location for which to configure the virtual environment.',
-        required=True,
-    )
-    parser.add_argument(
-        '--move',
-        help='Move the virtual environment to the destination.',
+        "--move",
+        help="Move the virtual environment to the destination.",
         default=False,
-        action='store_true',
+        action="store_true",
     )
 
     args = parser.parse_args()
     relocate(args.source, args.destination, args.move)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     main()
