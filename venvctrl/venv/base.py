@@ -252,6 +252,14 @@ class ActivateCshFile(ActivateFile):
     write_pattern = 'setenv VIRTUAL_ENV "{0}"'
 
 
+class ActivateXshFile(ActivateFile):
+
+    """The virtual environment /bin/activate.xhs script."""
+
+    read_pattern = re.compile(r'^\$VIRTUAL_ENV = r"(.*)"$')
+    write_pattern = '$VIRTUAL_ENV = r"{0}"'
+
+
 class BinDir(VenvDir):
 
     """Specialized VenvDir for the /bin directory."""
@@ -259,7 +267,12 @@ class BinDir(VenvDir):
     @property
     def activates(self):
         """Get an iter of activate files in the virtual environment."""
-        return (self.activate_sh, self.activate_csh, self.activate_fish)
+        return (
+            self.activate_sh,
+            self.activate_csh,
+            self.activate_fish,
+            self.activate_xsh,
+        )
 
     @property
     def activate_sh(self):
@@ -275,6 +288,11 @@ class BinDir(VenvDir):
     def activate_fish(self):
         """Get the /bin/activate.fish script."""
         return ActivateFishFile(os.path.join(self.path, "activate.fish"))
+
+    @property
+    def activate_xsh(self):
+        """Get the /bin/activate.xsh script."""
+        return ActivateXshFile(os.path.join(self.path, "activate.xsh"))
 
     @property
     def files(self):
