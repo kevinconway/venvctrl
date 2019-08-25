@@ -114,7 +114,7 @@ def test_relocate_no_original_path(venv):
     venv.relocate(path)
     dirs = list(venv.dirs)
     files = list(venv.files)
-    while len(dirs) > 0 or len(files) > 0:
+    while dirs or files:
         for file_ in files:
             with open(file_.abspath, "r") as source:
                 try:

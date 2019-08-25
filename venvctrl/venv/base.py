@@ -254,7 +254,7 @@ class ActivateCshFile(ActivateFile):
 
 class ActivateXshFile(ActivateFile):
 
-    """The virtual environment /bin/activate.xhs script."""
+    """The virtual environment /bin/activate.xsh script."""
 
     read_pattern = re.compile(r'^\$VIRTUAL_ENV = r"(.*)"$')
     write_pattern = '$VIRTUAL_ENV = r"{0}"'

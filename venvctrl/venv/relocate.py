@@ -57,7 +57,7 @@ class RelocateMixin(object):
         original_abspath = self.abspath
         dirs = list(self.dirs)
         files = list(self.files)
-        while len(dirs) > 0 or len(files) > 0:
+        while dirs or files:
             for file_ in files:
                 if file_.abspath.endswith(".pth"):
                     content = ""
