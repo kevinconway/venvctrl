@@ -55,10 +55,11 @@ class RelocateMixin(object):
         # site-packages, bundled within an egg directory, or both.
         original_path = self.path
         original_abspath = self.abspath
-        dirs = list(self.dirs)
-        files = list(self.files)
-        while dirs or files:
-            for file_ in files:
+        dirs = [self]
+        while dirs:
+            current = dirs.pop()
+            dirs.extend(current.dirs)
+            for file_ in current.files:
                 if file_.abspath.endswith(".pth"):
                     content = ""
                     with open(file_.abspath, "r") as source:
@@ -72,8 +73,6 @@ class RelocateMixin(object):
                     content = content.replace(original_path, destination)
                     with open(file_.abspath, "w") as source:
                         source.write(content)
-            next_dir = dirs.pop()
-            files = list(next_dir.files)
 
     def move(self, destination):
         """Reconfigure and move the virtual environment to another path.
