@@ -35,7 +35,7 @@ def test_create(random, tmpdir):
     try:
         venv.create()
     except subprocess.CalledProcessError as exc:
-        assert False, exc.stdout
+        assert False, exc.output
     assert tmpdir.join(random).check()
 
 
