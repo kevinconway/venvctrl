@@ -6,6 +6,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
+import subprocess
 import uuid
 
 import pytest
@@ -31,7 +32,10 @@ def test_create(random, tmpdir):
     """Test if new virtual environments can be created."""
     path = str(tmpdir.join(random))
     venv = api.VirtualEnvironment(path)
-    venv.create()
+    try:
+        venv.create()
+    except subprocess.CalledProcessError as exc:
+        assert False, exc.stdout
     assert tmpdir.join(random).check()
 
 
