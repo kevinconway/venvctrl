@@ -10,10 +10,6 @@ matrix:
       python: 2.7
       dist: trusty
       env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
-    - name: "Python 3.3"
-      python: 3.3
-      dist: trusty
-      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.4"
       python: 3.4
       dist: trusty
@@ -30,6 +26,10 @@ matrix:
       python: 3.7
       dist: xenial
       env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
+    - name: "Python 3.8"
+      python: 3.8
+      dist: xenial
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "PyPy"
       python: pypy
       dist: trusty
@@ -41,10 +41,6 @@ matrix:
 
     - name: "Python 2.7"
       python: 2.7
-      dist: trusty
-      env: TARGET_VENV_VERSION=">20.0.0"
-    - name: "Python 3.3"
-      python: 3.3
       dist: trusty
       env: TARGET_VENV_VERSION=">20.0.0"
     - name: "Python 3.4"
@@ -61,6 +57,10 @@ matrix:
       env: TARGET_VENV_VERSION=">20.0.0"
     - name: "Python 3.7"
       python: 3.7
+      dist: xenial
+      env: TARGET_VENV_VERSION=">20.0.0"
+    - name: "Python 3.8"
+      python: 3.8
       dist: xenial
       env: TARGET_VENV_VERSION=">20.0.0"
     - name: "PyPy"
