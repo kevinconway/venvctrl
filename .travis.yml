@@ -5,47 +5,90 @@ matrix:
     - name: "Python 2.6"
       python: 2.6
       dist: trusty
+      env: TARGET_VENV_VERSION="<16.0.0"
     - name: "Python 2.7"
       python: 2.7
       dist: trusty
-    - name: "Python 3.3"
-      python: 3.3
-      dist: trusty
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.4"
       python: 3.4
       dist: trusty
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.5"
       python: 3.5
       dist: trusty
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.6"
       python: 3.6
       dist: trusty
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.7"
       python: 3.7
       dist: xenial
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
+    - name: "Python 3.8"
+      python: 3.8
+      dist: xenial
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "PyPy"
       python: pypy
       dist: trusty
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "PyPy3"
       python: pypy3
       dist: trusty
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
+
+    - name: "Python 2.7"
+      python: 2.7
+      dist: trusty
+      env: TARGET_VENV_VERSION=">20.0.0"
+    - name: "Python 3.4"
+      python: 3.4
+      dist: trusty
+      env: TARGET_VENV_VERSION=">20.0.0"
+    - name: "Python 3.5"
+      python: 3.5
+      dist: trusty
+      env: TARGET_VENV_VERSION=">20.0.0"
+    - name: "Python 3.6"
+      python: 3.6
+      dist: trusty
+      env: TARGET_VENV_VERSION=">20.0.0"
+    - name: "Python 3.7"
+      python: 3.7
+      dist: xenial
+      env: TARGET_VENV_VERSION=">20.0.0"
+    - name: "Python 3.8"
+      python: 3.8
+      dist: xenial
+      env: TARGET_VENV_VERSION=">20.0.0"
+    - name: "PyPy"
+      python: pypy
+      dist: trusty
+      env: TARGET_VENV_VERSION=">20.0.0"
+    - name: "PyPy3"
+      python: pypy3
+      dist: trusty
+      env: TARGET_VENV_VERSION=">20.0.0"
 addons:
   apt:
     update: true
     packages:
-    - enchant
+      - enchant
 install:
-    - pip install -rrequirements.txt
-    - pip install -rtest-requirements.txt
-    - pip install -e ./
+  - pip install --force-reinstall "virtualenv${TARGET_VENV_VERSION}"
+  - pip install -rrequirements.txt
+  - pip install -rtest-requirements.txt
+  - pip install -e ./
 script:
-    # NOTE: We are ignoring Python 3.2 for all linters because virtually all of
-    # them dropped support for that Python version. Likewise, Pylint dropped
-    # support for Python3.3 so we have ignored it there as well. The expectation
-    # is that running these tools under the various other versions will be
-    # sufficient. Unfortunately for this project, these tools continue to
-    # periodically drop support for older versions of Python.
-    - if [[ "$(python --version 2>&1)" =~ Python\ (2\.7.*|3\.[3-7].*) ]]; then pycodestyle venvctrl/; else echo "Skipping PEP8 for $(python --version 2>&1)."; fi
-    - if [[ "$(python --version 2>&1)" =~ Python\ (2\.7.*|3\.[3-7].*) ]]; then pyflakes venvctrl/; else echo "Skipping PyFlakes for $(python --version 2>&1)."; fi
-    - if [[ "$(python --version 2>&1)" =~ Python\ (2\.7.*|3\.[4-7].*) ]]; then pylint --rcfile=.pylintrc venvctrl/; else echo "Skipping PyLint for $(python --version 2>&1)."; fi
-    - py.test tests/
+  # NOTE: We are ignoring Python 3.2 for all linters because virtually all of
+  # them dropped support for that Python version. Likewise, Pylint dropped
+  # support for Python3.3 so we have ignored it there as well. The expectation
+  # is that running these tools under the various other versions will be
+  # sufficient. Unfortunately for this project, these tools continue to
+  # periodically drop support for older versions of Python.
+  - if [[ "$(python --version 2>&1)" =~ Python\ (2\.7.*|3\.[3-7].*) ]]; then pycodestyle venvctrl/; else echo "Skipping PEP8 for $(python --version 2>&1)."; fi
+  - if [[ "$(python --version 2>&1)" =~ Python\ (2\.7.*|3\.[3-7].*) ]]; then pyflakes venvctrl/; else echo "Skipping PyFlakes for $(python --version 2>&1)."; fi
+  - if [[ "$(python --version 2>&1)" =~ Python\ (2\.7.*|3\.[4-7].*) ]]; then pylint --rcfile=.pylintrc venvctrl/; else echo "Skipping PyLint for $(python --version 2>&1)."; fi
+  - py.test tests/
