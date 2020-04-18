@@ -5,79 +5,79 @@ matrix:
     - name: "Python 2.6"
       python: 2.6
       dist: trusty
-      env: VIRTUALENV_VERSION="<16.0.0"
+      env: TARGET_VENV_VERSION="<16.0.0"
     - name: "Python 2.7"
       python: 2.7
       dist: trusty
-      env: VIRTUALENV_VERSION=">16.7.0,<20.0.0"
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.3"
       python: 3.3
       dist: trusty
-      env: VIRTUALENV_VERSION=">16.7.0,<20.0.0"
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.4"
       python: 3.4
       dist: trusty
-      env: VIRTUALENV_VERSION=">16.7.0,<20.0.0"
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.5"
       python: 3.5
       dist: trusty
-      env: VIRTUALENV_VERSION=">16.7.0,<20.0.0"
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.6"
       python: 3.6
       dist: trusty
-      env: VIRTUALENV_VERSION=">16.7.0,<20.0.0"
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "Python 3.7"
       python: 3.7
       dist: xenial
-      env: VIRTUALENV_VERSION=">16.7.0,<20.0.0"
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "PyPy"
       python: pypy
       dist: trusty
-      env: VIRTUALENV_VERSION=">16.7.0,<20.0.0"
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
     - name: "PyPy3"
       python: pypy3
       dist: trusty
-      env: VIRTUALENV_VERSION=">16.7.0,<20.0.0"
+      env: TARGET_VENV_VERSION=">16.7.0,<20.0.0"
 
     - name: "Python 2.7"
       python: 2.7
       dist: trusty
-      env: VIRTUALENV_VERSION=">20.0.0"
+      env: TARGET_VENV_VERSION=">20.0.0"
     - name: "Python 3.3"
       python: 3.3
       dist: trusty
-      env: VIRTUALENV_VERSION=">20.0.0"
+      env: TARGET_VENV_VERSION=">20.0.0"
     - name: "Python 3.4"
       python: 3.4
       dist: trusty
-      env: VIRTUALENV_VERSION=">20.0.0"
+      env: TARGET_VENV_VERSION=">20.0.0"
     - name: "Python 3.5"
       python: 3.5
       dist: trusty
-      env: VIRTUALENV_VERSION=">20.0.0"
+      env: TARGET_VENV_VERSION=">20.0.0"
     - name: "Python 3.6"
       python: 3.6
       dist: trusty
-      env: VIRTUALENV_VERSION=">20.0.0"
+      env: TARGET_VENV_VERSION=">20.0.0"
     - name: "Python 3.7"
       python: 3.7
       dist: xenial
-      env: VIRTUALENV_VERSION=">20.0.0"
+      env: TARGET_VENV_VERSION=">20.0.0"
     - name: "PyPy"
       python: pypy
       dist: trusty
-      env: VIRTUALENV_VERSION=">20.0.0"
+      env: TARGET_VENV_VERSION=">20.0.0"
     - name: "PyPy3"
       python: pypy3
       dist: trusty
-      env: VIRTUALENV_VERSION=">20.0.0"
+      env: TARGET_VENV_VERSION=">20.0.0"
 addons:
   apt:
     update: true
     packages:
       - enchant
 install:
-  - pip install --force-reinstall "virtualenv${VIRTUALENV_VERSION}"
+  - pip install --force-reinstall "virtualenv${TARGET_VENV_VERSION}"
   - pip install -rrequirements.txt
   - pip install -rtest-requirements.txt
   - pip install -e ./
