@@ -207,8 +207,8 @@ class ActivateFile(BinFile):
 
     """The virtual environment /bin/activate script."""
 
-    read_pattern = re.compile(r'^VIRTUAL_ENV="(.*)"$')
-    write_pattern = 'VIRTUAL_ENV="{0}"'
+    read_pattern = re.compile(r'''^VIRTUAL_ENV=["'](.*)["']$''')
+    write_pattern = 'VIRTUAL_ENV=\'{0}\''
 
     def _find_vpath(self):
         """Find the VIRTUAL_ENV path entry."""
@@ -240,23 +240,23 @@ class ActivateFishFile(ActivateFile):
 
     """The virtual environment /bin/activate.fish script."""
 
-    read_pattern = re.compile(r'^set -gx VIRTUAL_ENV "(.*)"$')
-    write_pattern = 'set -gx VIRTUAL_ENV "{0}"'
+    read_pattern = re.compile(r'''^set -gx VIRTUAL_ENV ["'](.*)["']$''')
+    write_pattern = 'set -gx VIRTUAL_ENV \'{0}\''
 
 
 class ActivateCshFile(ActivateFile):
 
     """The virtual environment /bin/activate.csh script."""
 
-    read_pattern = re.compile(r'^setenv VIRTUAL_ENV "(.*)"$')
-    write_pattern = 'setenv VIRTUAL_ENV "{0}"'
+    read_pattern = re.compile(r'''^setenv VIRTUAL_ENV ["'](.*)["']$''')
+    write_pattern = 'setenv VIRTUAL_ENV \'{0}\''
 
 
 class ActivateXshFile(ActivateFile):
 
     """The virtual environment /bin/activate.xsh script."""
 
-    read_pattern = re.compile(r'^\$VIRTUAL_ENV = r"(.*)"$')
+    read_pattern = re.compile(r'''^\$VIRTUAL_ENV = r["'](.*)["']$''')
     write_pattern = '$VIRTUAL_ENV = r"{0}"'
 
 
