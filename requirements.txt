@@ -1,1 +1,1 @@
-virtualenv>=20.0.0,<20.8.0
+virtualenv<=20.11.2

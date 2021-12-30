@@ -207,8 +207,8 @@ class ActivateFile(BinFile):
 
     """The virtual environment /bin/activate script."""
 
-    read_pattern = re.compile(r'''^VIRTUAL_ENV=["'](.*)["']$''')
-    write_pattern = 'VIRTUAL_ENV=\'{0}\''
+    read_pattern = re.compile(r"""^VIRTUAL_ENV=["'](.*)["']$""")
+    write_pattern = "VIRTUAL_ENV='{0}'"
 
     def _find_vpath(self):
         """Find the VIRTUAL_ENV path entry."""
@@ -240,24 +240,57 @@ class ActivateFishFile(ActivateFile):
 
     """The virtual environment /bin/activate.fish script."""
 
-    read_pattern = re.compile(r'''^set -gx VIRTUAL_ENV ["'](.*)["']$''')
-    write_pattern = 'set -gx VIRTUAL_ENV \'{0}\''
+    read_pattern = re.compile(r"""^set -gx VIRTUAL_ENV ["'](.*)["']$""")
+    write_pattern = "set -gx VIRTUAL_ENV '{0}'"
 
 
 class ActivateCshFile(ActivateFile):
 
     """The virtual environment /bin/activate.csh script."""
 
-    read_pattern = re.compile(r'''^setenv VIRTUAL_ENV ["'](.*)["']$''')
-    write_pattern = 'setenv VIRTUAL_ENV \'{0}\''
+    read_pattern = re.compile(r"""^setenv VIRTUAL_ENV ["'](.*)["']$""")
+    write_pattern = "setenv VIRTUAL_ENV '{0}'"
 
 
 class ActivateXshFile(ActivateFile):
 
     """The virtual environment /bin/activate.xsh script."""
 
-    read_pattern = re.compile(r'''^\$VIRTUAL_ENV = r["'](.*)["']$''')
+    read_pattern = re.compile(r"""^\$VIRTUAL_ENV = r["'](.*)["']$""")
     write_pattern = '$VIRTUAL_ENV = r"{0}"'
+
+
+class ActivateNuFile(ActivateFile):
+
+    """The virtual environment /bin/activate.nu script.
+
+    Note that the NU shell activation script is different from previously
+    supported shells because it contains two references to the virtualenv path
+    rather than one. This is because it requires a specialized deactivate
+    script which is aliased to the deactivate command.
+    """
+
+    read_pattern = re.compile(r"""^let virtual-env = ["'](.*)["']$""")
+    write_pattern = 'let virtual-env = "{0}"'
+
+
+class ActivateNuFileDeactivateAlias(ActivateFile):
+
+    """The virtual environment /bin/activate.nu script's deactivate alias.
+
+    This is the second part of the NU shell activation script modification
+    This is implemented as a second activate script as a convenience. The
+    ActivateFile base class only ever expected that a single line in the
+    activate script would contain the virtualenv path. NU shell is the first
+    script to break that expectation. Rather than re-write the ActivateFile
+    class, this class models the second line containing the path as a second
+    file in order to use the inherited regex matching logic.
+    """
+
+    read_pattern = re.compile(
+        r"""^alias deactivate = source ["'](.*)/bin/deactivate.nu["']$"""
+    )
+    write_pattern = 'alias deactivate = source "{0}/bin/deactivate.nu"'
 
 
 class BinDir(VenvDir):
@@ -274,6 +307,8 @@ class BinDir(VenvDir):
                 self.activate_csh,
                 self.activate_fish,
                 self.activate_xsh,
+                self.activate_nu,
+                self.activate_nu_deactivate,
             )
             if activation.exists
         )
@@ -297,6 +332,26 @@ class BinDir(VenvDir):
     def activate_xsh(self):
         """Get the /bin/activate.xsh script."""
         return ActivateXshFile(os.path.join(self.path, "activate.xsh"))
+
+    @property
+    def activate_nu(self):
+        """Get the /bin/activate.nu script."""
+        return ActivateNuFile(os.path.join(self.path, "activate.nu"))
+
+    @property
+    def activate_nu_deactivate(self):
+        """Get the /bin/activate.nu script.
+
+        This returns the same underlying file as the activate_nu property but
+        is configured to target all vpath operations to the secondary
+        virtualenv path reference that exists to set up the deactivate
+        command. Generally, any use of the activate_nu property to modify the
+        vpath must be repeated with this property as well. See the
+        ActivateNuFileDeactivateAlias class documentation for more information.
+        """
+        return ActivateNuFileDeactivateAlias(
+            os.path.join(self.path, "activate.nu")
+        )
 
     @property
     def files(self):
