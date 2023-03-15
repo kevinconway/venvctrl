@@ -298,6 +298,22 @@ class ActivateNuFileDeactivateAlias(ActivateFile):
         r"""^alias deactivate = source ["'](.*)/bin/deactivate.nu["']$"""
     )
 
+    @property
+    def exists(self):
+        """
+        Get if the path exists.
+        
+        Overwite VenvPath property. The /bin/activate.nu scipt generated 
+        by virtualenv>=20.14.0 does contain a virtual path anymore.
+        So, relocation is only required for older versions.
+
+        Returns:
+            bool: True if the /bin/activate.nu exists and it contains a virtual path
+                  for deactivate.
+        """
+
+        return os.path.exists(self.path) and self.vpath is not None
+
 
 class BinDir(VenvDir):
 
