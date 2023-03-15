@@ -270,9 +270,15 @@ class ActivateNuFile(ActivateFile):
     supported shells because it contains two references to the virtualenv path
     rather than one. This is because it requires a specialized deactivate
     script which is aliased to the deactivate command.
+
+    activate.nu:3 generated with virtualenv 20.13.3
+    let virtual-env = "/tmp/test_venv"
+
+    activate.nu:34 generated with virtualenv 20.21.0
+    ....let virtual_env = '/tmp/test_venv'
     """
 
-    read_pattern = re.compile(r"""^let virtual-env = ["'](.*)["']$""")
+    read_pattern = re.compile(r"""^\s*let virtual[-_]env = ["'](.*)["']$""")
 
 
 class ActivateNuFileDeactivateAlias(ActivateFile):
