@@ -45,11 +45,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        pyver: ["2.7", "3.5", "3.6", "3.7"]
+        pyver: ["3.7", "3.8", "3.9", "3.10", "3.11"]
       fail-fast: true
     steps:
       - name: Install deps
-        run: sudo apt-get update && sudo apt-get install -y enchant
+        run: sudo apt-get update && sudo apt-get install -y enchant-2
       - name: Checkout
         uses: actions/checkout@v2.4.0
       - name: Setup Python ${{ matrix.pyver }}
@@ -65,7 +65,6 @@ jobs:
             ${{ runner.os }}-pip-${{ matrix.pyver }}-
       - name: Install dependencies
         run: |
-          if [[ "$(python --version 2>&1)" =~ Python\ (2\.*) ]]; then pip install -U jinja2; else echo "Skipping JINJA2 for $(python --version 2>&1)."; fi
           python -m pip install -r requirements.txt
           python -m pip install -r test-requirements.txt
           python -m pip install -e ./
