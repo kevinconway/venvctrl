@@ -302,8 +302,8 @@ class ActivateNuFileDeactivateAlias(ActivateFile):
     def exists(self):
         """
         Get if the path exists.
-        
-        Overwite VenvPath property. The /bin/activate.nu scipt generated 
+
+        Overwite VenvPath property. The /bin/activate.nu scipt generated
         by virtualenv>=20.14.0 does contain a virtual path anymore.
         So, relocation is only required for older versions.
 
