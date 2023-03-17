@@ -208,10 +208,15 @@ class ActivateFile(BinFile):
     """The virtual environment /bin/activate script."""
 
     read_pattern = re.compile(r"""^VIRTUAL_ENV=["'](.*)["']$""")
-    write_pattern = "VIRTUAL_ENV='{0}'"
 
     def _find_vpath(self):
-        """Find the VIRTUAL_ENV path entry."""
+        """
+        Find the VIRTUAL_ENV path entry.
+
+        Returns:
+            tuple: A tuple containing the matched line, the old vpath, and the line number where the virtual
+            path was found. If the virtual path is not found, returns a tuple of three None values.
+        """
         with open(self.path, "r") as file_handle:
 
             for count, line in enumerate(file_handle):
@@ -219,21 +224,21 @@ class ActivateFile(BinFile):
                 match = self.read_pattern.match(line)
                 if match:
 
-                    return match.group(1), count
+                    return match.group(0), match.group(1), count
 
-        return None, None
+        return None, None, None
 
     @property
     def vpath(self):
         """Get the path to the virtual environment."""
-        return self._find_vpath()[0]
+        return self._find_vpath()[1]
 
     @vpath.setter
     def vpath(self, new_vpath):
         """Change the path to the virtual environment."""
-        _, line_number = self._find_vpath()
-        new_vpath = self.write_pattern.format(new_vpath)
-        self.writeline(new_vpath, line_number)
+        old_line, old_vpath, line_number = self._find_vpath()
+        new_line = old_line.replace(old_vpath, new_vpath)
+        self.writeline(new_line, line_number)
 
 
 class ActivateFishFile(ActivateFile):
@@ -241,7 +246,6 @@ class ActivateFishFile(ActivateFile):
     """The virtual environment /bin/activate.fish script."""
 
     read_pattern = re.compile(r"""^set -gx VIRTUAL_ENV ["'](.*)["']$""")
-    write_pattern = "set -gx VIRTUAL_ENV '{0}'"
 
 
 class ActivateCshFile(ActivateFile):
@@ -249,7 +253,6 @@ class ActivateCshFile(ActivateFile):
     """The virtual environment /bin/activate.csh script."""
 
     read_pattern = re.compile(r"""^setenv VIRTUAL_ENV ["'](.*)["']$""")
-    write_pattern = "setenv VIRTUAL_ENV '{0}'"
 
 
 class ActivateXshFile(ActivateFile):
@@ -257,7 +260,6 @@ class ActivateXshFile(ActivateFile):
     """The virtual environment /bin/activate.xsh script."""
 
     read_pattern = re.compile(r"""^\$VIRTUAL_ENV = r["'](.*)["']$""")
-    write_pattern = '$VIRTUAL_ENV = r"{0}"'
 
 
 class ActivateNuFile(ActivateFile):
@@ -268,10 +270,15 @@ class ActivateNuFile(ActivateFile):
     supported shells because it contains two references to the virtualenv path
     rather than one. This is because it requires a specialized deactivate
     script which is aliased to the deactivate command.
+
+    activate.nu:3 generated with virtualenv 20.13.3
+    let virtual-env = "/tmp/test_venv"
+
+    activate.nu:34 generated with virtualenv 20.21.0
+    ....let virtual_env = '/tmp/test_venv'
     """
 
-    read_pattern = re.compile(r"""^let virtual-env = ["'](.*)["']$""")
-    write_pattern = 'let virtual-env = "{0}"'
+    read_pattern = re.compile(r"""^\s*let virtual[-_]env = ["'](.*)["']$""")
 
 
 class ActivateNuFileDeactivateAlias(ActivateFile):
@@ -290,7 +297,22 @@ class ActivateNuFileDeactivateAlias(ActivateFile):
     read_pattern = re.compile(
         r"""^alias deactivate = source ["'](.*)/bin/deactivate.nu["']$"""
     )
-    write_pattern = 'alias deactivate = source "{0}/bin/deactivate.nu"'
+
+    @property
+    def exists(self):
+        """
+        Get if the path exists.
+        
+        Overwite VenvPath property. The /bin/activate.nu scipt generated 
+        by virtualenv>=20.14.0 does contain a virtual path anymore.
+        So, relocation is only required for older versions.
+
+        Returns:
+            bool: True if the /bin/activate.nu exists and it contains a virtual path
+                  for deactivate.
+        """
+
+        return os.path.exists(self.path) and self.vpath is not None
 
 
 class BinDir(VenvDir):
