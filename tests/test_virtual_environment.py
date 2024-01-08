@@ -7,25 +7,8 @@ from __future__ import unicode_literals
 
 import os
 import subprocess
-import uuid
-
-import pytest
 
 from venvctrl import api
-
-
-@pytest.fixture(scope="function")
-def random():
-    """Get a random UUID."""
-    return str(uuid.uuid4())
-
-
-@pytest.fixture(scope="function")
-def venv(random, tmpdir):
-    """Get an initialized venv."""
-    v = api.VirtualEnvironment(str(tmpdir.join(random)))
-    v.create()
-    return v
 
 
 def test_create(random, tmpdir):
