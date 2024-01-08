@@ -101,6 +101,33 @@ class VenvFile(VenvPath):
 
             tmp_file.close()
 
+    def replace(self, old, new):
+        """Replace old with new in every occurrence.
+
+        Args:
+            old (str): The original text.
+            new (str): The new text.
+        """
+        tmp_file = tempfile.TemporaryFile("w+")
+        try:
+
+            with open(self.path, "r") as file_handle:
+
+                for line in file_handle:
+
+                    line = line.replace(old, new)
+                    tmp_file.write(line)
+
+            tmp_file.seek(0)
+            with open(self.path, "w") as file_handle:
+
+                for new_line in tmp_file:
+
+                    file_handle.write(new_line)
+        finally:
+
+            tmp_file.close()
+
 
 class VenvDir(VenvPath):
 
@@ -205,7 +232,12 @@ class BinFile(VenvFile):
 
 class ActivateFile(BinFile):
 
-    """The virtual environment /bin/activate script."""
+    """A common base for all activate scripts.
+
+    Implementations should replace the read_pattern for cases where the path can
+    be extracted with a regex. More complex use cases should override the
+    _find_vpath method to perform a search and return the appropriate path.
+    """
 
     read_pattern = re.compile(r"""^VIRTUAL_ENV=["'](.*)["']$""")
 
@@ -239,6 +271,58 @@ class ActivateFile(BinFile):
         old_line, old_vpath, line_number = self._find_vpath()
         new_line = old_line.replace(old_vpath, new_vpath)
         self.writeline(new_line, line_number)
+
+
+class ActivateFileBash(ActivateFile):
+
+    """The virtual environment /bin/activate script.
+
+    This version accounts for differences between the virtualenv and venv
+    activation scripts for bash.
+    """
+
+    read_pattern = re.compile(r"""^VIRTUAL_ENV=["'](.*)["']$""")
+    read_pattern_stdlib_venv = re.compile(r"""^ *export VIRTUAL_ENV=["'](.*)["']$""")
+
+    def _find_vpath(self):
+        """
+        Find the VIRTUAL_ENV path entry.
+
+        Returns:
+            tuple: A tuple containing the matched line, the old vpath, and the line number where the virtual
+            path was found. If the virtual path is not found, returns a tuple of three None values.
+        """
+        with open(self.path, "r") as file_handle:
+
+            for count, line in enumerate(file_handle):
+
+                match = self.read_pattern.match(line)
+                if match:
+
+                    return match.group(0), match.group(1), count
+                match = self.read_pattern_stdlib_venv.match(line)
+                if match:
+
+                    return match.group(0), match.group(1), count
+
+        return None, None, None
+
+    @property
+    def vpath(self):
+        """Get the path to the virtual environment."""
+        return self._find_vpath()[1]
+
+    @vpath.setter
+    def vpath(self, new_vpath):
+        """Change the path to the virtual environment.
+
+        The bash activate file from the standard library venv duplicates the
+        full path in multiple places instead of only one place like in
+        virtualenv. To account, this code now does a line by line replacement
+        of the old path to ensure that it is replaced everywhere.
+        """
+        _, old_vpath, _ = self._find_vpath()
+        self.replace(old_vpath, new_vpath)
 
 
 class ActivateFishFile(ActivateFile):
@@ -338,7 +422,7 @@ class BinDir(VenvDir):
     @property
     def activate_sh(self):
         """Get the /bin/activate script."""
-        return ActivateFile(os.path.join(self.path, "activate"))
+        return ActivateFileBash(os.path.join(self.path, "activate"))
 
     @property
     def activate_csh(self):
