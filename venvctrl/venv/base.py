@@ -226,6 +226,19 @@ class ActivateFile(BinFile):
 
                     return match.group(0), match.group(1), count
 
+        # If still here then maybe Python 3.12 and change regex
+
+        read_pattern = re.compile(r"""export VIRTUAL_ENV=["'](.*)["']$""")
+
+        with open(self.path, "r") as file_handle:
+
+            for count, line in enumerate(file_handle):
+
+                match = self.read_pattern.match(line)
+                if match:
+
+                    return match.group(0), match.group(1), count
+        
         return None, None, None
 
     @property
