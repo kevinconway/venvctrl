@@ -281,8 +281,8 @@ class ActivateFileBash(ActivateFile):
     activation scripts for bash.
     """
 
-    read_pattern = re.compile(r"""^VIRTUAL_ENV=["'](.*)["']$""")
-    read_pattern_stdlib_venv = re.compile(r"""^ *export VIRTUAL_ENV=["'](.*)["']$""")
+    read_pattern = re.compile(r"""^VIRTUAL_ENV=["']?(.*)["']?$""")
+    read_pattern_stdlib_venv = re.compile(r"""^ *export VIRTUAL_ENV=["']?(.*)["']?$""")
 
     def _find_vpath(self):
         """
@@ -329,21 +329,21 @@ class ActivateFishFile(ActivateFile):
 
     """The virtual environment /bin/activate.fish script."""
 
-    read_pattern = re.compile(r"""^set -gx VIRTUAL_ENV ["'](.*)["']$""")
+    read_pattern = re.compile(r"""^set -gx VIRTUAL_ENV ["']?(.*)["']?$""")
 
 
 class ActivateCshFile(ActivateFile):
 
     """The virtual environment /bin/activate.csh script."""
 
-    read_pattern = re.compile(r"""^setenv VIRTUAL_ENV ["'](.*)["']$""")
+    read_pattern = re.compile(r"""^setenv VIRTUAL_ENV ["']?(.*)["']?$""")
 
 
 class ActivateXshFile(ActivateFile):
 
     """The virtual environment /bin/activate.xsh script."""
 
-    read_pattern = re.compile(r"""^\$VIRTUAL_ENV = r["'](.*)["']$""")
+    read_pattern = re.compile(r"""^\$VIRTUAL_ENV = r["']?(.*)["']?$""")
 
 
 class ActivateNuFile(ActivateFile):
@@ -362,7 +362,7 @@ class ActivateNuFile(ActivateFile):
     ....let virtual_env = '/tmp/test_venv'
     """
 
-    read_pattern = re.compile(r"""^\s*let virtual[-_]env = ["'](.*)["']$""")
+    read_pattern = re.compile(r"""^\s*let virtual[-_]env = r?\#?["']?(.*)["']?\#?$""")
 
 
 class ActivateNuFileDeactivateAlias(ActivateFile):

@@ -1,0 +1,31 @@
+{
+    "name": "venvctrl",
+    "build": {
+        "dockerfile": "Containerfile",
+        "context": ".."
+    },
+    "remoteUser": "ubuntu",
+    "updateRemoteUserUID": true,
+    "containerEnv": {},
+    "mounts": [],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "telemetry.telemetryLevel": "off",
+                "telemetry.enableTelemetry": false,
+                "files.insertFinalNewline": true,
+                "files.trimTrailingWhitespace": true,
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/usr/bin/bash"
+                    }
+                },
+                "terminal.integrated.defaultProfile.linux": "bash"
+            },
+            "extensions": [
+                "ms-python.python",
+                "redhat.vscode-yaml"
+            ]
+        }
+    }
+}
