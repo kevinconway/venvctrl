@@ -1,0 +1,21 @@
+FROM docker.io/ubuntu:latest
+
+RUN apt-get update && apt-get install --yes \
+    curl wget \
+    make git vim less \
+    sudo \
+    bash-completion man \
+    software-properties-common \
+    build-essential libssl-dev zlib1g-dev libbz2-dev \
+    libreadline-dev libsqlite3-dev llvm libncurses5-dev libncursesw5-dev \
+    xz-utils tk-dev libffi-dev liblzma-dev \
+    python3-pip && \
+    pip install --break-system-packages tox virtualenv
+
+RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && \
+    apt-get install --yes python3.10 python3.11 python3.12 python3.13 \
+    python3.10-distutils python3.11-distutils \
+    python3-venv python3.10-venv python3.11-venv python3.13-venv python3.13-venv
+
+RUN echo ubuntu ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/ubuntu \
+    && chmod 0440 /etc/sudoers.d/ubuntu
