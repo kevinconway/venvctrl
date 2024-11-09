@@ -10,7 +10,7 @@ with open("README.rst", "r") as readmefile:
 
 setup(
     name="venvctrl",
-    version="0.8.0",
+    version="0.9.0",
     url="https://github.com/kevinconway/venvctrl",
     description="API for virtual environments.",
     author="Kevin Conway",

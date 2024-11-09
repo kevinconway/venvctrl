@@ -239,7 +239,7 @@ class ActivateFile(BinFile):
     _find_vpath method to perform a search and return the appropriate path.
     """
 
-    read_pattern = re.compile(r"""^VIRTUAL_ENV=["'](.*)["']$""")
+    read_pattern = re.compile(r"""^VIRTUAL_ENV=["']([^"']*)["']$""")
 
     def _find_vpath(self):
         """
@@ -256,7 +256,7 @@ class ActivateFile(BinFile):
                 match = self.read_pattern.match(line)
                 if match:
 
-                    return match.group(0), match.group(1), count
+                    return match.group(0), match.group(1).strip(), count
 
         return None, None, None
 
@@ -268,9 +268,8 @@ class ActivateFile(BinFile):
     @vpath.setter
     def vpath(self, new_vpath):
         """Change the path to the virtual environment."""
-        old_line, old_vpath, line_number = self._find_vpath()
-        new_line = old_line.replace(old_vpath, new_vpath)
-        self.writeline(new_line, line_number)
+        _, old_vpath, _ = self._find_vpath()
+        self.replace(old_vpath, new_vpath)
 
 
 class ActivateFileBash(ActivateFile):
@@ -281,69 +280,95 @@ class ActivateFileBash(ActivateFile):
     activation scripts for bash.
     """
 
-    read_pattern = re.compile(r"""^VIRTUAL_ENV=["']?(.*)["']?$""")
-    read_pattern_stdlib_venv = re.compile(r"""^ *export VIRTUAL_ENV=["']?(.*)["']?$""")
-
-    def _find_vpath(self):
-        """
-        Find the VIRTUAL_ENV path entry.
-
-        Returns:
-            tuple: A tuple containing the matched line, the old vpath, and the line number where the virtual
-            path was found. If the virtual path is not found, returns a tuple of three None values.
-        """
-        with open(self.path, "r") as file_handle:
-
-            for count, line in enumerate(file_handle):
-
-                match = self.read_pattern.match(line)
-                if match:
-
-                    return match.group(0), match.group(1), count
-                match = self.read_pattern_stdlib_venv.match(line)
-                if match:
-
-                    return match.group(0), match.group(1), count
-
-        return None, None, None
-
-    @property
-    def vpath(self):
-        """Get the path to the virtual environment."""
-        return self._find_vpath()[1]
-
-    @vpath.setter
-    def vpath(self, new_vpath):
-        """Change the path to the virtual environment.
-
-        The bash activate file from the standard library venv duplicates the
-        full path in multiple places instead of only one place like in
-        virtualenv. To account, this code now does a line by line replacement
-        of the old path to ensure that it is replaced everywhere.
-        """
-        _, old_vpath, _ = self._find_vpath()
-        self.replace(old_vpath, new_vpath)
+    # The pattern to match a bash file's VIRTUAL_ENV path changed during the
+    # virtualenv/venv split and has evolved in both projects over time. The
+    # following pattern matches all known versions of the path for both
+    # virtualenv and venv.
+    #
+    # For historical context, the original virtualenv pattern was:
+    #
+    # > VIRTUAL_ENV="/path/to/virtualenv"
+    #
+    # which was originally matched using `^VIRTUAL_ENV=["'](.*)["']$`. The
+    # 20.26.6 release of virtualenv removed the quotations so they were made
+    # optional in the pattern with `^VIRTUAL_ENV=["']?(.*)["']?$`.
+    #
+    # When the venv package was added to the standard library it introduced a
+    # new activation script template:
+    #
+    # > export VIRTUAL_ENV="/path/to/venv"
+    #
+    # This text was indented and included the "export" prefix so it did not
+    # match the same pattern as virtualenv. For some time, this code made use of
+    # two distinct patterns to match either virtualenv or venv. The original
+    # venv pattern was `^ *export VIRTUAL_ENV=["'](.*)["']$`. After the 20.26.6
+    # release of virtualenv, I went ahead and made the quotes optional for venv
+    # as well in case it copied that behavior some day resulting in
+    # `^ *export VIRTUAL_ENV=["']?(.*)["']?$`.
+    #
+    # Another notable difference between venv and virtualenv is that the full
+    # path of the VIRTUAL_ENV variable is present multiple times in venv
+    # scripts. This wasn't always the case for venv but this condition existed
+    # by the time I added venv support. The virtualenv scripts will assign the
+    # value only once using the full path and any other assignment is based on a
+    # reference to the original variable rather than another copy of the path.
+    # The biggest example of this is adapting the unix path of the virtual
+    # environment to a cygwin path. The virtualenv template is this:
+    #
+    # > VIRTUAL_ENV=/path/to/virtualenv
+    # > if ([ "$OSTYPE" = "cygwin" ] || [ "$OSTYPE" = "msys" ]) && $(command -v cygpath &> /dev/null) ; then
+    # >     VIRTUAL_ENV=$(cygpath -u "$VIRTUAL_ENV")
+    # > fi
+    # > export VIRTUAL_ENV
+    #
+    # The venv template for the same logic is this:
+    #
+    # > if [ "${OSTYPE:-}" = "cygwin" ] || [ "${OSTYPE:-}" = "msys" ] ; then
+    # >     export VIRTUAL_ENV=$(cygpath "/workspaces/venvctrl/test")
+    # > else
+    # >    export VIRTUAL_ENV="/workspaces/venvctrl/test"
+    # > fi
+    #
+    # To account for this I refactored the path rewriting logic to rewrite all
+    # occurrences of the path rather than selectively rewriting only the single
+    # line that matched the pattern. However, there was a bug in the pattern
+    # used for venv that resulted in the Windows logic branch never being
+    # rewritten in a venv activation script. The main issue is that the pattern
+    # included a match for the end-of-line character which resulted in the
+    # rewrite logic only replacing the path in locations that ended in an
+    # immediate end-of-line. The path setting line in the Windows branch of a
+    # venv script does not end in a newline so it was left as-is. This likely
+    # went undetected because it only affected windows users and rpmvenv users
+    # who have explicitly swapped virtualenv for venv. To fix this, all
+    # extracted paths are now stripped of whitespace.
+    #
+    # There was a secondary and mostly benign bug in the pattern as well which
+    # is that it also matched the closing quote character if present. Generally,
+    # the activation scripts are consistent with quoting so this didn't affect
+    # functionality but I fixed it anyway by making the capture group used to
+    # extract the path valid only for non-quote characters with `([^"']*)`.
+    read_pattern = re.compile(r"""^\s*(?:export)?\s*VIRTUAL_ENV=\s*["']?([^"']*)["']?$""")
 
 
 class ActivateFishFile(ActivateFile):
 
     """The virtual environment /bin/activate.fish script."""
 
-    read_pattern = re.compile(r"""^set -gx VIRTUAL_ENV ["']?(.*)["']?$""")
+    read_pattern = re.compile(r"""^set -gx VIRTUAL_ENV ["']?([^"']*)["']?$""")
 
 
 class ActivateCshFile(ActivateFile):
 
     """The virtual environment /bin/activate.csh script."""
 
-    read_pattern = re.compile(r"""^setenv VIRTUAL_ENV ["']?(.*)["']?$""")
+    read_pattern = re.compile(r"""^setenv VIRTUAL_ENV ["']?([^"']*)["']?$""")
 
 
 class ActivateXshFile(ActivateFile):
 
     """The virtual environment /bin/activate.xsh script."""
 
-    read_pattern = re.compile(r"""^\$VIRTUAL_ENV = r["']?(.*)["']?$""")
+    read_pattern = re.compile(r"""^\$VIRTUAL_ENV = r["']?([^"']*)["']?$""")
 
 
 class ActivateNuFile(ActivateFile):
@@ -362,7 +387,7 @@ class ActivateNuFile(ActivateFile):
     ....let virtual_env = '/tmp/test_venv'
     """
 
-    read_pattern = re.compile(r"""^\s*let virtual[-_]env = r?\#?["']?(.*)["']?\#?$""")
+    read_pattern = re.compile(r"""^\s*let virtual[-_]env = r?\#?["']?([^"']*)["']?\#?$""")
 
 
 class ActivateNuFileDeactivateAlias(ActivateFile):

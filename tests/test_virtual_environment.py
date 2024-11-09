@@ -91,10 +91,12 @@ def test_relocate_long_shebang(venv):
                 )
 
 
-def test_relocate_no_original_path_pth(venv):
-    """Test that the original path is not found in .pth files."""
+def test_relocate_no_original_path(venv):
+    """Test that the original path is not found in any non-binary file."""
     path = "/testpath"
     original_path = venv.abspath
+    # Drop a .pth in the virtualenv/venv to ensure that we're still testing
+    # these files even if they aren't generated anymore in modern builds.
     f = open(venv.bin.abspath + "/something.pth", "w")
     f.write(original_path)
     f.close()
@@ -104,13 +106,14 @@ def test_relocate_no_original_path_pth(venv):
         current = dirs.pop()
         dirs.extend(current.dirs)
         for file_ in current.files:
-            if file_.abspath.endswith(".pth"):
-                with open(file_.abspath, "r") as source:
-                    try:
-                        lines = source.readlines()
-                    except UnicodeDecodeError:
-                        # Skip any non-text files. Binary files are out of
-                        # scope for this test.
-                        continue
-                    for line in lines:
-                        assert original_path not in line, file_.abspath
+            if file_.abspath.endswith("pyvenv.cfg"):
+                continue  # Skip the pytest installed files
+            with open(file_.abspath, "r") as source:
+                try:
+                    lines = source.readlines()
+                except UnicodeDecodeError:
+                    # Skip any non-text files. Binary files are out of
+                    # scope for this test.
+                    continue
+                for line in lines:
+                    assert original_path not in line, file_.abspath
