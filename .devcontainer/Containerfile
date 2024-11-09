@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install --yes \
     pip install --break-system-packages tox virtualenv
 
 RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && \
-    apt-get install --yes python3.10 python3.11 python3.12 python3.13 \
+    apt-get install --yes python3.9 python3.10 python3.11 python3.12 python3.13 \
     python3.10-distutils python3.11-distutils \
-    python3-venv python3.10-venv python3.11-venv python3.13-venv python3.13-venv
+    python3-venv python3.9-venv python3.10-venv python3.11-venv python3.13-venv python3.13-venv
 
 RUN echo ubuntu ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/ubuntu \
     && chmod 0440 /etc/sudoers.d/ubuntu
