@@ -347,7 +347,7 @@ class ActivateFileBash(ActivateFile):
     # the activation scripts are consistent with quoting so this didn't affect
     # functionality but I fixed it anyway by making the capture group used to
     # extract the path valid only for non-quote characters with `([^"']*)`.
-    read_pattern = re.compile(r"""^\s*(?:export)?\s*VIRTUAL_ENV=\s*["']?([^"']*)["']?$""")
+    read_pattern = re.compile(r"""^\s*(?:export)?\s*VIRTUAL_ENV=\s*(?:\$\(cygpath\s*)?["']?([^"'\)]*)["']?\)?$""")
 
 
 class ActivateFishFile(ActivateFile):
